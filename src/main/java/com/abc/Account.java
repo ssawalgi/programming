@@ -5,69 +5,80 @@ import java.util.List;
 
 public class Account {
 
-    public static final int CHECKING = 0;
-    public static final int SAVINGS = 1;
-    public static final int MAXI_SAVINGS = 2;
+	public static final int CHECKING = 0;
+	public static final int SAVINGS = 1;
+	public static final int MAXI_SAVINGS = 2;
+	public static final double ONE_THOUSAND_DOLLARS = 1000;
+	public static final double TWO_THOUSAND_DOLLARS = 2000;
+	public static final double POINT_ONE_PERCENT = 0.001;
+	public static final double POINT_TWO_PERCENT = 0.002;
+	public static final double TWO_PERCENT = 0.02;
+	public static final double FIVE_PERCENT = 0.05;
+	public static final double TEN_PERCENT = 0.1;
 
-    private final int accountType;
-    public List<Transaction> transactions;
+	private final int accountType;
+	public List<Transaction> transactions;
 
-    public Account(int accountType) {
-        this.accountType = accountType;
-        this.transactions = new ArrayList<Transaction>();
-    }
+	public Account(int accountType) {
+		this.accountType = accountType;
+		this.transactions = new ArrayList<Transaction>();
+	}
 
-    public void deposit(double amount) {
-        if (amount <= 0) {
-            throw new IllegalArgumentException("amount must be greater than zero");
-        } else {
-            transactions.add(new Transaction(amount));
-        }
-    }
+	public void deposit(double amount) {
+		if (amount <= 0) {
+			throw new IllegalArgumentException("amount must be greater than zero");
+		} else {
+			transactions.add(new Transaction(amount));
+		}
+	}
 
-public void withdraw(double amount) {
-    if (amount <= 0) {
-        throw new IllegalArgumentException("amount must be greater than zero");
-    } else {
-        transactions.add(new Transaction(-amount));
-    }
-}
+	public void withdraw(double amount) {
+		if (amount <= 0) {
+			throw new IllegalArgumentException("amount must be greater than zero");
+		} else {
+			transactions.add(new Transaction(-amount));
+		}
+	}
 
-    public double interestEarned() {
-        double amount = sumTransactions();
-        switch(accountType){
-            case SAVINGS:
-                if (amount <= 1000)
-                    return amount * 0.001;
-                else
-                    return 1 + (amount-1000) * 0.002;
-//            case SUPER_SAVINGS:
-//                if (amount <= 4000)
-//                    return 20;
-            case MAXI_SAVINGS:
-                if (amount <= 1000)
-                    return amount * 0.02;
-                if (amount <= 2000)
-                    return 20 + (amount-1000) * 0.05;
-                return 70 + (amount-2000) * 0.1;
-            default:
-                return amount * 0.001;
-        }
-    }
+	public double getInterestEarned() {
+		double amount = sumTransactions();
+		switch(accountType){
+		case SAVINGS:
+			if (amount <= ONE_THOUSAND_DOLLARS)
+				return calculateInterest(amount, POINT_ONE_PERCENT);
+			else
+				return 1 + calculateInterest(amount-ONE_THOUSAND_DOLLARS, POINT_TWO_PERCENT);
 
-    public double sumTransactions() {
-       return checkIfTransactionsExist(true);
-    }
+		case MAXI_SAVINGS:
+			if (amount <= ONE_THOUSAND_DOLLARS)
+				return calculateInterest(amount, TWO_PERCENT);
 
-    private double checkIfTransactionsExist(boolean checkAll) {
-        double amount = 0.0;
-        for (Transaction t: transactions)
-            amount += t.amount;
-        return amount;
-    }
+			if (amount <= TWO_THOUSAND_DOLLARS)
+				return 20 + calculateInterest(amount-ONE_THOUSAND_DOLLARS, FIVE_PERCENT);
 
-    public int getAccountType() {
-        return accountType;
-    }
+			return 70 + calculateInterest(amount-TWO_THOUSAND_DOLLARS, TEN_PERCENT); 
 
+		default:
+			return calculateInterest(amount, POINT_ONE_PERCENT);
+		}
+	}
+
+	public double sumTransactions() {
+		return checkIfTransactionsExist(true);
+	}
+
+	private double checkIfTransactionsExist(boolean checkAll) {
+		double amount = 0.0;
+		for (Transaction eachTransaction: transactions)
+			amount += eachTransaction.amount;
+		return amount;
+	}
+
+	public int getAccountType() {
+		return accountType;
+	}
+	private double calculateInterest(double amount, double interestRate ){
+		return amount*interestRate;
+
+	}
 }
